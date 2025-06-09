@@ -1,140 +1,7 @@
 # Codemagic configuration for Contacts Dashboard App
 workflows:
-  android-build-native:
-    name: Android Build (Native)
-    max_build_duration: 30
-    instance_type: mac_mini_m1
-    environment:
-      node: 18.17.0
-      npm: 9.6.7
-      java: 17
-      android_signing:
-        - keystore_reference
-      groups:
-        - google_play
-    scripts:
-      - name: Install dependencies
-        script: |
-          npm install --legacy-peer-deps
-      - name: Install Expo CLI
-        script: |
-          npm install -g @expo/cli
-      - name: Prebuild Android
-        script: |
-          npx expo prebuild --platform android --clear
-      - name: Build Android APK
-        script: |
-          cd android
-          ./gradlew assembleRelease
-    artifacts:
-      - android/app/build/outputs/**/*.apk
-      - android/app/build/outputs/**/*.aab
-    publishing:
-      email:
-        recipients:
-          - user@example.com
-        notify:
-          success: true
-          failure: true
-
-  android-build-unsigned:
-    name: Android Build (Unsigned - No EAS)
-    max_build_duration: 30
-    instance_type: mac_mini_m1
-    environment:
-      node: 18.17.0
-      npm: 9.6.7
-      java: 17
-    scripts:
-      - name: Install dependencies
-        script: |
-          npm install --legacy-peer-deps
-      - name: Install Expo CLI
-        script: |
-          npm install -g @expo/cli
-      - name: Prebuild Android
-        script: |
-          npx expo prebuild --platform android --clear
-      - name: Build Android APK (Debug)
-        script: |
-          cd android
-          ./gradlew assembleDebug
-    artifacts:
-      - android/app/build/outputs/**/*.apk
-    publishing:
-      email:
-        recipients:
-          - user@example.com
-        notify:
-          success: true
-          failure: true
-
-  android-build-simple:
-    name: Android Build (Simple)
-    max_build_duration: 30
-    instance_type: mac_mini_m1
-    environment:
-      node: 18.17.0
-      npm: 9.6.7
-    scripts:
-      - name: Install dependencies
-        script: |
-          npm install --legacy-peer-deps
-      - name: Install Expo CLI
-        script: |
-          npm install -g @expo/cli
-      - name: Export for production
-        script: |
-          npx expo export --platform android
-      - name: Create APK using Expo CLI
-        script: |
-          npx expo run:android --variant release
-    artifacts:
-      - "*.apk"
-      - "android/app/build/outputs/**/*.apk"
-    publishing:
-      email:
-        recipients:
-          - user@example.com
-        notify:
-          success: true
-          failure: true
-
-  android-build-turtle:
-    name: Android Build (Turtle CLI - Legacy)
-    max_build_duration: 30
-    instance_type: mac_mini_m1
-    environment:
-      node: 18.17.0
-      npm: 9.6.7
-      vars:
-        EXPO_USERNAME: $EXPO_USERNAME
-        EXPO_PASSWORD: $EXPO_PASSWORD
-    scripts:
-      - name: Install dependencies
-        script: |
-          npm install --legacy-peer-deps
-      - name: Install Turtle CLI
-        script: |
-          npm install -g turtle-cli
-      - name: Setup Turtle
-        script: |
-          turtle setup:android
-      - name: Build APK with Turtle
-        script: |
-          turtle build:android --keystore-path ./keystore.jks --keystore-alias alias --type apk
-    artifacts:
-      - "*.apk"
-    publishing:
-      email:
-        recipients:
-          - user@example.com
-        notify:
-          success: true
-          failure: true
-
-  android-debug-build:
-    name: Android Debug Build (Unsigned)
+  android-build:
+    name: Android Build (Debug)
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
@@ -172,8 +39,8 @@ workflows:
           success: true
           failure: true
 
-  android-release-unsigned:
-    name: Android Release Build (Unsigned)
+  android-build-release:
+    name: Android Build (Release Unsigned)
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
