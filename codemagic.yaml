@@ -5,8 +5,8 @@ workflows:
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
-      node: 16.15.0
-      npm: 8.5.5
+      node: 18.17.0
+      npm: 9.6.7
       groups:
         - google_play
       vars:
@@ -19,8 +19,8 @@ workflows:
           npm install --legacy-peer-deps
       - name: Set up EAS
         script: |
-          npm install -g eas-cli
-          eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
+          npm install -g eas-cli@latest
+          echo "$EXPO_PASSWORD" | eas login --username "$EXPO_USERNAME"
       - name: Build Android APK
         script: |
           eas build --platform android --profile preview --non-interactive
@@ -40,8 +40,8 @@ workflows:
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
-      node: 16.15.0
-      npm: 8.5.5
+      node: 18.17.0
+      npm: 9.6.7
       vars:
         EXPO_USERNAME: $EXPO_USERNAME
         EXPO_PASSWORD: $EXPO_PASSWORD
@@ -52,8 +52,8 @@ workflows:
           npm install --legacy-peer-deps
       - name: Set up EAS
         script: |
-          npm install -g eas-cli
-          eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
+          npm install -g eas-cli@latest
+          echo "$EXPO_PASSWORD" | eas login --username "$EXPO_USERNAME"
       - name: Build Android APK (Unsigned)
         script: |
           eas build --platform android --profile preview --non-interactive
@@ -75,8 +75,8 @@ workflows:
     integrations:
       app_store_connect: Codemagic
     environment:
-      node: 16.15.0
-      npm: 8.5.5
+      node: 18.17.0
+      npm: 9.6.7
       xcode: latest
       cocoapods: default
       groups:
@@ -91,8 +91,8 @@ workflows:
           npm install --legacy-peer-deps
       - name: Set up EAS
         script: |
-          npm install -g eas-cli
-          eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
+          npm install -g eas-cli@latest
+          echo "$EXPO_PASSWORD" | eas login --username "$EXPO_USERNAME"
       - name: Build iOS
         script: |
           eas build --platform ios --profile preview --non-interactive
@@ -117,8 +117,8 @@ workflows:
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
-      node: 16.15.0
-      npm: 8.5.5
+      node: 18.17.0
+      npm: 9.6.7
       vars:
         EXPO_USERNAME: $EXPO_USERNAME
         EXPO_PASSWORD: $EXPO_PASSWORD
@@ -129,8 +129,8 @@ workflows:
           npm install --legacy-peer-deps
       - name: Set up EAS
         script: |
-          npm install -g eas-cli
-          eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
+          npm install -g eas-cli@latest
+          echo "$EXPO_PASSWORD" | eas login --username "$EXPO_USERNAME"
       - name: Update EAS configuration
         script: |
           eas update --auto
