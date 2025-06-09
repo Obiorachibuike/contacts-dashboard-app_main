@@ -12,6 +12,7 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
+          npm install expo-build-properties --legacy-peer-deps
       - name: Install Expo CLI
         script: |
           npm install -g @expo/cli
@@ -52,6 +53,7 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
+          npm install expo-build-properties --legacy-peer-deps
       - name: Install Expo CLI
         script: |
           npm install -g @expo/cli
