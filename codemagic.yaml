@@ -13,6 +13,8 @@ workflows:
         script: |
           npm install --legacy-peer-deps
           npm install expo@^53.0.0 react-native@^0.79.0 --legacy-peer-deps
+          # Ensure React Native CLI is properly installed
+          npm install @react-native-community/cli@^12.0.0 --save-dev --legacy-peer-deps
       - name: Install Expo CLI
         script: |
           npm install -g @expo/cli
@@ -33,7 +35,20 @@ workflows:
           mkdir -p android/app/src/main/assets
       - name: Bundle JavaScript code
         script: |
-          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+          # Ensure React Native CLI is available
+          npx @react-native-community/cli --version
+          
+          # Create the bundle with proper error handling
+          npx @react-native-community/cli bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res/ \
+            --verbose
+          
+          # Verify the bundle was created
+          ls -la android/app/src/main/assets/
       - name: Make gradlew executable
         script: |
           chmod +x android/gradlew
@@ -68,6 +83,8 @@ workflows:
         script: |
           npm install --legacy-peer-deps
           npm install expo@^53.0.0 react-native@^0.79.0 --legacy-peer-deps
+          # Ensure React Native CLI is properly installed
+          npm install @react-native-community/cli@^12.0.0 --save-dev --legacy-peer-deps
       - name: Install Expo CLI
         script: |
           npm install -g @expo/cli
@@ -88,7 +105,20 @@ workflows:
           mkdir -p android/app/src/main/assets
       - name: Bundle JavaScript code
         script: |
-          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+          # Ensure React Native CLI is available
+          npx @react-native-community/cli --version
+          
+          # Create the bundle with proper error handling
+          npx @react-native-community/cli bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res/ \
+            --verbose
+          
+          # Verify the bundle was created
+          ls -la android/app/src/main/assets/
       - name: Make gradlew executable
         script: |
           chmod +x android/gradlew
