@@ -15,9 +15,10 @@ workflows:
       - name: Install Expo CLI
         script: |
           npm install -g @expo/cli
-      - name: Prebuild Android project
+      - name: Clean and prebuild Android project
         script: |
-          npx expo prebuild --platform android --clear
+          rm -rf android ios
+          npx expo prebuild --platform android
       - name: Make gradlew executable
         script: |
           chmod +x android/gradlew
@@ -54,9 +55,10 @@ workflows:
       - name: Install Expo CLI
         script: |
           npm install -g @expo/cli
-      - name: Prebuild Android project
+      - name: Clean and prebuild Android project
         script: |
-          npx expo prebuild --platform android --clear
+          rm -rf android ios
+          npx expo prebuild --platform android
       - name: Make gradlew executable
         script: |
           chmod +x android/gradlew
