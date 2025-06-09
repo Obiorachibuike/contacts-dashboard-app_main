@@ -12,14 +12,22 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-          npm install expo-build-properties --legacy-peer-deps
+          npm install expo@~53.0.10 react-native@0.79.3 --legacy-peer-deps
       - name: Install Expo CLI
         script: |
-          npm install -g @expo/cli
+          npm install -g @expo/cli@3.13.6
+      - name: Create missing assets
+        script: |
+          mkdir -p assets
+          # Create a simple 1024x1024 PNG icon using ImageMagick (available on mac_mini_m1)
+          convert -size 1024x1024 xc:blue assets/icon.png
+          convert -size 1024x1024 xc:green assets/adaptive-icon.png
+          convert -size 1284x2778 xc:white assets/splash.png
+          convert -size 32x32 xc:blue assets/favicon.png
       - name: Clean and prebuild Android project
         script: |
           rm -rf android ios
-          npx expo prebuild --platform android
+          npx expo prebuild --platform android --no-install
       - name: Make gradlew executable
         script: |
           chmod +x android/gradlew
@@ -53,14 +61,22 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-          npm install expo-build-properties --legacy-peer-deps
+          npm install expo@~53.0.10 react-native@0.79.3 --legacy-peer-deps
       - name: Install Expo CLI
         script: |
-          npm install -g @expo/cli
+          npm install -g @expo/cli@3.13.6
+      - name: Create missing assets
+        script: |
+          mkdir -p assets
+          # Create simple placeholder images
+          convert -size 1024x1024 xc:blue assets/icon.png
+          convert -size 1024x1024 xc:green assets/adaptive-icon.png
+          convert -size 1284x2778 xc:white assets/splash.png
+          convert -size 32x32 xc:blue assets/favicon.png
       - name: Clean and prebuild Android project
         script: |
           rm -rf android ios
-          npx expo prebuild --platform android
+          npx expo prebuild --platform android --no-install
       - name: Make gradlew executable
         script: |
           chmod +x android/gradlew
