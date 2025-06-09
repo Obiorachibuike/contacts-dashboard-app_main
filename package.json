@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@expo/dom-webview": "latest",
+    "@expo/metro-runtime": "latest",
     "@expo/vector-icons": "latest",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "1.2.2",
@@ -64,6 +66,7 @@
     "react-native-gesture-handler": "latest",
     "react-native-safe-area-context": "latest",
     "react-native-screens": "latest",
+    "react-native-webview": "latest",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
     "sonner": "^1.7.1",

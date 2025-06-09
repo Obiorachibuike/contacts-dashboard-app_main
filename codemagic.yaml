@@ -28,6 +28,12 @@ workflows:
         script: |
           rm -rf android ios
           npx expo prebuild --platform android --no-install
+      - name: Create bundle directory
+        script: |
+          mkdir -p android/app/src/main/assets
+      - name: Bundle JavaScript code
+        script: |
+          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
       - name: Make gradlew executable
         script: |
           chmod +x android/gradlew
@@ -77,6 +83,12 @@ workflows:
         script: |
           rm -rf android ios
           npx expo prebuild --platform android --no-install
+      - name: Create bundle directory
+        script: |
+          mkdir -p android/app/src/main/assets
+      - name: Bundle JavaScript code
+        script: |
+          npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
       - name: Make gradlew executable
         script: |
           chmod +x android/gradlew
