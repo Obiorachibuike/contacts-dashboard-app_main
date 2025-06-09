@@ -12,10 +12,10 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-          npm install expo@~53.0.10 react-native@0.79.3 --legacy-peer-deps
+          npm install expo@^53.0.0 react-native@^0.79.0 --legacy-peer-deps
       - name: Install Expo CLI
         script: |
-          npm install -g @expo/cli@3.13.6
+          npm install -g @expo/cli
       - name: Create missing assets
         script: |
           mkdir -p assets
@@ -61,10 +61,10 @@ workflows:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-          npm install expo@~53.0.10 react-native@0.79.3 --legacy-peer-deps
+          npm install expo@^53.0.0 react-native@^0.79.0 --legacy-peer-deps
       - name: Install Expo CLI
         script: |
-          npm install -g @expo/cli@3.13.6
+          npm install -g @expo/cli
       - name: Create missing assets
         script: |
           mkdir -p assets
