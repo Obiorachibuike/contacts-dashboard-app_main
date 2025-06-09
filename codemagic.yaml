@@ -7,8 +7,6 @@ workflows:
     environment:
       node: 16.15.0
       npm: 8.5.5
-      android_signing:
-        - keystore_reference
       groups:
         - google_play
       vars:
@@ -25,14 +23,10 @@ workflows:
           eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
       - name: Build Android APK
         script: |
-          eas build --platform android --profile preview --non-interactive --no-wait
-      - name: Build local APK for testing
-        script: |
-          cd android
-          ./gradlew assembleRelease
+          eas build --platform android --profile preview --non-interactive
     artifacts:
-      - android/app/build/outputs/**/*.apk
-      - android/app/build/outputs/**/*.aab
+      - "*.apk"
+      - "*.aab"
     publishing:
       email:
         recipients:
@@ -40,8 +34,36 @@ workflows:
         notify:
           success: true
           failure: true
-      slack:
-        channel: '#builds'
+
+  android-build-unsigned:
+    name: Android Build (Unsigned)
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      node: 16.15.0
+      npm: 8.5.5
+      vars:
+        EXPO_USERNAME: $EXPO_USERNAME
+        EXPO_PASSWORD: $EXPO_PASSWORD
+        EXPO_PROJECT_ID: $EXPO_PROJECT_ID
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install
+      - name: Set up EAS
+        script: |
+          npm install -g eas-cli
+          eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
+      - name: Build Android APK (Unsigned)
+        script: |
+          eas build --platform android --profile preview --non-interactive
+    artifacts:
+      - "*.apk"
+      - "*.aab"
+    publishing:
+      email:
+        recipients:
+          - user@example.com
         notify:
           success: true
           failure: true
@@ -73,7 +95,7 @@ workflows:
           eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
       - name: Build iOS
         script: |
-          eas build --platform ios --profile preview --non-interactive --no-wait
+          eas build --platform ios --profile preview --non-interactive
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
@@ -114,7 +136,7 @@ workflows:
           eas update --auto
       - name: Build for Expo
         script: |
-          eas build --platform all --profile production --non-interactive --no-wait
+          eas build --platform all --profile production --non-interactive
     publishing:
       email:
         recipients:
