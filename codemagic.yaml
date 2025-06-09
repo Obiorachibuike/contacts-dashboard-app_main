@@ -1,32 +1,34 @@
 # Codemagic configuration for Contacts Dashboard App
 workflows:
-  android-build:
-    name: Android Build
+  android-build-native:
+    name: Android Build (Native)
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
       node: 18.17.0
       npm: 9.6.7
+      java: 17
+      android_signing:
+        - keystore_reference
       groups:
         - google_play
-      vars:
-        EXPO_USERNAME: $EXPO_USERNAME
-        EXPO_PASSWORD: $EXPO_PASSWORD
-        EXPO_PROJECT_ID: $EXPO_PROJECT_ID
     scripts:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-      - name: Set up EAS
+      - name: Install Expo CLI
         script: |
-          npm install -g eas-cli@latest
-          echo "$EXPO_PASSWORD" | eas login --username "$EXPO_USERNAME"
+          npm install -g @expo/cli
+      - name: Prebuild Android
+        script: |
+          npx expo prebuild --platform android --clear
       - name: Build Android APK
         script: |
-          eas build --platform android --profile preview --non-interactive
+          cd android
+          ./gradlew assembleRelease
     artifacts:
-      - "*.apk"
-      - "*.aab"
+      - android/app/build/outputs/**/*.apk
+      - android/app/build/outputs/**/*.aab
     publishing:
       email:
         recipients:
@@ -36,30 +38,60 @@ workflows:
           failure: true
 
   android-build-unsigned:
-    name: Android Build (Unsigned)
+    name: Android Build (Unsigned - No EAS)
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
       node: 18.17.0
       npm: 9.6.7
-      vars:
-        EXPO_USERNAME: $EXPO_USERNAME
-        EXPO_PASSWORD: $EXPO_PASSWORD
-        EXPO_PROJECT_ID: $EXPO_PROJECT_ID
+      java: 17
     scripts:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-      - name: Set up EAS
+      - name: Install Expo CLI
         script: |
-          npm install -g eas-cli@latest
-          echo "$EXPO_PASSWORD" | eas login --username "$EXPO_USERNAME"
-      - name: Build Android APK (Unsigned)
+          npm install -g @expo/cli
+      - name: Prebuild Android
         script: |
-          eas build --platform android --profile preview --non-interactive
+          npx expo prebuild --platform android --clear
+      - name: Build Android APK (Debug)
+        script: |
+          cd android
+          ./gradlew assembleDebug
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - user@example.com
+        notify:
+          success: true
+          failure: true
+
+  android-build-simple:
+    name: Android Build (Simple)
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      node: 18.17.0
+      npm: 9.6.7
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install --legacy-peer-deps
+      - name: Install Expo CLI
+        script: |
+          npm install -g @expo/cli
+      - name: Export for production
+        script: |
+          npx expo export --platform android
+      - name: Create APK using Expo CLI
+        script: |
+          npx expo run:android --variant release
     artifacts:
       - "*.apk"
-      - "*.aab"
+      - "android/app/build/outputs/**/*.apk"
     publishing:
       email:
         recipients:
@@ -68,39 +100,31 @@ workflows:
           success: true
           failure: true
 
-  ios-build:
-    name: iOS Build
+  android-build-turtle:
+    name: Android Build (Turtle CLI - Legacy)
     max_build_duration: 30
     instance_type: mac_mini_m1
-    integrations:
-      app_store_connect: Codemagic
     environment:
       node: 18.17.0
       npm: 9.6.7
-      xcode: latest
-      cocoapods: default
-      groups:
-        - app_store_credentials
       vars:
         EXPO_USERNAME: $EXPO_USERNAME
         EXPO_PASSWORD: $EXPO_PASSWORD
-        EXPO_PROJECT_ID: $EXPO_PROJECT_ID
     scripts:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-      - name: Set up EAS
+      - name: Install Turtle CLI
         script: |
-          npm install -g eas-cli@latest
-          echo "$EXPO_PASSWORD" | eas login --username "$EXPO_USERNAME"
-      - name: Build iOS
+          npm install -g turtle-cli
+      - name: Setup Turtle
         script: |
-          eas build --platform ios --profile preview --non-interactive
+          turtle setup:android
+      - name: Build APK with Turtle
+        script: |
+          turtle build:android --keystore-path ./keystore.jks --keystore-alias alias --type apk
     artifacts:
-      - build/ios/ipa/*.ipa
-      - /tmp/xcodebuild_logs/*.log
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
-      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+      - "*.apk"
     publishing:
       email:
         recipients:
@@ -108,35 +132,77 @@ workflows:
         notify:
           success: true
           failure: true
-      app_store_connect:
-        auth: integration
-        submit_to_testflight: true
 
-  expo-build:
-    name: Expo Build
+  android-debug-build:
+    name: Android Debug Build (Unsigned)
     max_build_duration: 30
     instance_type: mac_mini_m1
     environment:
       node: 18.17.0
       npm: 9.6.7
-      vars:
-        EXPO_USERNAME: $EXPO_USERNAME
-        EXPO_PASSWORD: $EXPO_PASSWORD
-        EXPO_PROJECT_ID: $EXPO_PROJECT_ID
+      java: 17
     scripts:
       - name: Install dependencies
         script: |
           npm install --legacy-peer-deps
-      - name: Set up EAS
+      - name: Install Expo CLI
         script: |
-          npm install -g eas-cli@latest
-          echo "$EXPO_PASSWORD" | eas login --username "$EXPO_USERNAME"
-      - name: Update EAS configuration
+          npm install -g @expo/cli
+      - name: Prebuild Android project
         script: |
-          eas update --auto
-      - name: Build for Expo
+          npx expo prebuild --platform android --clear
+      - name: Make gradlew executable
         script: |
-          eas build --platform all --profile production --non-interactive
+          chmod +x android/gradlew
+      - name: Build Android Debug APK
+        script: |
+          cd android
+          ./gradlew assembleDebug
+      - name: List build outputs
+        script: |
+          find android/app/build/outputs -name "*.apk" -type f
+    artifacts:
+      - android/app/build/outputs/apk/debug/*.apk
+      - android/app/build/outputs/apk/**/*.apk
+    publishing:
+      email:
+        recipients:
+          - user@example.com
+        notify:
+          success: true
+          failure: true
+
+  android-release-unsigned:
+    name: Android Release Build (Unsigned)
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      node: 18.17.0
+      npm: 9.6.7
+      java: 17
+    scripts:
+      - name: Install dependencies
+        script: |
+          npm install --legacy-peer-deps
+      - name: Install Expo CLI
+        script: |
+          npm install -g @expo/cli
+      - name: Prebuild Android project
+        script: |
+          npx expo prebuild --platform android --clear
+      - name: Make gradlew executable
+        script: |
+          chmod +x android/gradlew
+      - name: Build Android Release APK (Unsigned)
+        script: |
+          cd android
+          ./gradlew assembleRelease
+      - name: List build outputs
+        script: |
+          find android/app/build/outputs -name "*.apk" -type f
+    artifacts:
+      - android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/apk/**/*.apk
     publishing:
       email:
         recipients:
