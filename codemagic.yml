@@ -1,0 +1,125 @@
+# Codemagic configuration for Contacts Dashboard App
+workflows:
+  android-build:
+    name: Android Build
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      node: 16.15.0
+      npm: 8.5.5
+      yarn: 1.22.17
+      android_signing:
+        - keystore_reference
+      groups:
+        - google_play
+      vars:
+        EXPO_USERNAME: $EXPO_USERNAME
+        EXPO_PASSWORD: $EXPO_PASSWORD
+        EXPO_PROJECT_ID: $EXPO_PROJECT_ID
+    scripts:
+      - name: Install dependencies
+        script: |
+          yarn install
+      - name: Set up EAS
+        script: |
+          npm install -g eas-cli
+          eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
+      - name: Build Android APK
+        script: |
+          eas build --platform android --profile preview --non-interactive --no-wait
+      - name: Build local APK for testing
+        script: |
+          cd android
+          ./gradlew assembleRelease
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+      - android/app/build/outputs/**/*.aab
+    publishing:
+      email:
+        recipients:
+          - user@example.com
+        notify:
+          success: true
+          failure: true
+      slack:
+        channel: '#builds'
+        notify:
+          success: true
+          failure: true
+
+  ios-build:
+    name: iOS Build
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      node: 16.15.0
+      npm: 8.5.5
+      yarn: 1.22.17
+      xcode: latest
+      cocoapods: default
+      groups:
+        - app_store_credentials
+      vars:
+        EXPO_USERNAME: $EXPO_USERNAME
+        EXPO_PASSWORD: $EXPO_PASSWORD
+        EXPO_PROJECT_ID: $EXPO_PROJECT_ID
+    scripts:
+      - name: Install dependencies
+        script: |
+          yarn install
+      - name: Set up EAS
+        script: |
+          npm install -g eas-cli
+          eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
+      - name: Build iOS
+        script: |
+          eas build --platform ios --profile preview --non-interactive --no-wait
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      email:
+        recipients:
+          - user@example.com
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+
+  expo-build:
+    name: Expo Build
+    max_build_duration: 30
+    instance_type: mac_mini_m1
+    environment:
+      node: 16.15.0
+      npm: 8.5.5
+      yarn: 1.22.17
+      vars:
+        EXPO_USERNAME: $EXPO_USERNAME
+        EXPO_PASSWORD: $EXPO_PASSWORD
+        EXPO_PROJECT_ID: $EXPO_PROJECT_ID
+    scripts:
+      - name: Install dependencies
+        script: |
+          yarn install
+      - name: Set up EAS
+        script: |
+          npm install -g eas-cli
+          eas login --non-interactive -u $EXPO_USERNAME -p $EXPO_PASSWORD
+      - name: Update EAS configuration
+        script: |
+          eas update --auto
+      - name: Build for Expo
+        script: |
+          eas build --platform all --profile production --non-interactive --no-wait
+    publishing:
+      email:
+        recipients:
+          - user@example.com
+        notify:
+          success: true
+          failure: true
