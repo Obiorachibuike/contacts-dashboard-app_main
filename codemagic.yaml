@@ -7,7 +7,6 @@ workflows:
     environment:
       node: 16.15.0
       npm: 8.5.5
-      yarn: 1.22.17
       android_signing:
         - keystore_reference
       groups:
@@ -19,7 +18,7 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          yarn install
+          npm install
       - name: Set up EAS
         script: |
           npm install -g eas-cli
@@ -54,7 +53,6 @@ workflows:
     environment:
       node: 16.15.0
       npm: 8.5.5
-      yarn: 1.22.17
       xcode: latest
       cocoapods: default
       groups:
@@ -66,7 +64,7 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          yarn install
+          npm install
       - name: Set up EAS
         script: |
           npm install -g eas-cli
@@ -97,7 +95,6 @@ workflows:
     environment:
       node: 16.15.0
       npm: 8.5.5
-      yarn: 1.22.17
       vars:
         EXPO_USERNAME: $EXPO_USERNAME
         EXPO_PASSWORD: $EXPO_PASSWORD
@@ -105,7 +102,7 @@ workflows:
     scripts:
       - name: Install dependencies
         script: |
-          yarn install
+          npm install
       - name: Set up EAS
         script: |
           npm install -g eas-cli
